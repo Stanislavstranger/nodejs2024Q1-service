@@ -1,4 +1,4 @@
-export class TracksModel {
+export class TrackModel {
   id: string;
   name: string;
   artistId: string | null;

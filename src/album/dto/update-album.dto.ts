@@ -1,5 +1,4 @@
-export class AlbumsModel {
-  id: string;
+export class UpdateAlbumDto {
   name: string;
   year: number;
   artistId: string | null;

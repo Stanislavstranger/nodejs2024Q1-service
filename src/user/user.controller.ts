@@ -27,7 +27,7 @@ export class UserController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @Put(':id')
@@ -35,11 +35,11 @@ export class UserController {
     @Param('id') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    return this.userService.update(+id, updatePasswordDto);
+    return this.userService.update(id, updatePasswordDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.remove(id);
   }
 }

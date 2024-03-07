@@ -27,7 +27,7 @@ export class AlbumController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.albumService.findOne(+id);
+    return this.albumService.findOne(id);
   }
 
   @Put(':id')
@@ -35,11 +35,11 @@ export class AlbumController {
     @Param('id') id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    return this.albumService.update(+id, updateAlbumDto);
+    return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.albumService.remove(+id);
+    return this.albumService.remove(id);
   }
 }

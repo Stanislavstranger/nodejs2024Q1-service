@@ -27,7 +27,7 @@ export class ArtistController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.artistService.findOne(+id);
+    return this.artistService.findOne(id);
   }
 
   @Put(':id')
@@ -35,11 +35,11 @@ export class ArtistController {
     @Param('id') id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
-    return this.artistService.update(+id, updateArtistDto);
+    return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.artistService.remove(+id);
+    return this.artistService.remove(id);
   }
 }

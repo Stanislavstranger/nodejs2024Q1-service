@@ -27,7 +27,7 @@ export class TrackController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.trackService.findOne(+id);
+    return this.trackService.findOne(id);
   }
 
   @Put(':id')
@@ -35,11 +35,11 @@ export class TrackController {
     @Param('id') id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
-    return this.trackService.update(+id, updateTrackDto);
+    return this.trackService.update(id, updateTrackDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.trackService.remove(+id);
+    return this.trackService.remove(id);
   }
 }

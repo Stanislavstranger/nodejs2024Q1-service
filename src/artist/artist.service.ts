@@ -3,11 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistModel } from './artist.model';
-import { DbService } from '../db/db.service';
+import { DBService } from '../db/db.service';
+import { NOT_FOUND_ARTIST_ERROR } from './artist.constants';
 
 @Injectable()
 export class ArtistService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(private readonly dbService: DBService) {}
 
   async create(createArtistDto: CreateArtistDto): Promise<ArtistModel> {
     const db = await this.dbService.getDb();
@@ -28,7 +29,7 @@ export class ArtistService {
     const db = await this.dbService.getDb();
     const artist = db.artists.find((artist) => artist.id === id);
     if (!artist) {
-      throw new NotFoundException('Artist not found');
+      throw new NotFoundException(NOT_FOUND_ARTIST_ERROR);
     }
     return artist;
   }
@@ -53,7 +54,7 @@ export class ArtistService {
     const db = await this.dbService.getDb();
     const index = db.artists.findIndex((artist) => artist.id === id);
     if (index === -1) {
-      throw new NotFoundException('Artist not found');
+      throw new NotFoundException(NOT_FOUND_ARTIST_ERROR);
     }
     db.artists.splice(index, 1);
   }

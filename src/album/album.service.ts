@@ -3,11 +3,12 @@ import { v4 as uuidv4, validate } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumModel } from './album.model';
-import { DbService } from '../db/db.service';
+import { DBService } from '../db/db.service';
+import { NOT_FOUND_ALBUM_ERROR } from './album.constants';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(private readonly dbService: DBService) {}
 
   async create(createAlbumDto: CreateAlbumDto): Promise<AlbumModel> {
     const db = await this.dbService.getDb();
@@ -28,7 +29,7 @@ export class AlbumService {
     const db = await this.dbService.getDb();
     const album = db.albums.find((album) => album.id === id);
     if (!album) {
-      throw new NotFoundException('Album not found');
+      throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
     }
     return album;
   }
@@ -53,7 +54,7 @@ export class AlbumService {
     const db = await this.dbService.getDb();
     const index = db.albums.findIndex((album) => album.id === id);
     if (index === -1) {
-      throw new NotFoundException('Album not found');
+      throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
     }
     db.albums.splice(index, 1);
   }

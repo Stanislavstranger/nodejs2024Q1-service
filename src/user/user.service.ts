@@ -7,11 +7,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserModel } from './user.model';
-import { DbService } from '../db/db.service';
+import { DBService } from '../db/db.service';
+import { NOT_FOUND_USER_ERROR } from './user.constants';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(private readonly dbService: DBService) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserModel> {
     const db = await this.dbService.getDb();
@@ -35,7 +36,7 @@ export class UserService {
     const db = await this.dbService.getDb();
     const user = db.users.find((user) => user.id === id);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(NOT_FOUND_USER_ERROR);
     }
     return user;
   }
@@ -58,7 +59,7 @@ export class UserService {
     const db = await this.dbService.getDb();
     const index = db.users.findIndex((user) => user.id === id);
     if (index === -1) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(NOT_FOUND_USER_ERROR);
     }
     db.users.splice(index, 1);
   }

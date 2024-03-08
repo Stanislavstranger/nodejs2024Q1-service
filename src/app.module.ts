@@ -7,9 +7,11 @@ import { ArtistModule } from './artist/artist.module';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 import { DBModule } from './db/db.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     DBModule,
     FavoriteModule,
     AlbumModule,

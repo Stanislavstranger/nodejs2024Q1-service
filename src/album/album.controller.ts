@@ -6,6 +6,8 @@ import {
   Param,
   Put,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
@@ -15,6 +17,7 @@ import { AlbumService } from './album.service';
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() createAlbumDto: CreateAlbumDto) {
     return this.albumService.create(createAlbumDto);

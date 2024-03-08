@@ -6,6 +6,8 @@ import {
   Param,
   Put,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
@@ -15,6 +17,7 @@ import { TrackService } from './track.service';
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
+  @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() createTrackDto: CreateTrackDto) {
     return this.trackService.create(createTrackDto);

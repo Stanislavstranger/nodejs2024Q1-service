@@ -47,10 +47,8 @@ export class UserService {
   async remove(id: string): Promise<boolean> {
     const db = await this.dbService.getDb();
     const index = db.users.findIndex((user) => user.id === id);
-    console.log(index);
     if (index !== -1) {
       db.users.splice(index, 1);
-      console.log('найдено');
       return true;
     }
     return false;

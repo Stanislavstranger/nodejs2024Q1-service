@@ -17,14 +17,14 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserService } from './user.service';
-import { isUUID } from 'class-validator';
 import { NOT_FOUND_USER_ERROR } from './user.constants';
+import { IdValidationPipe } from '../pipes/ad-validation.pipe';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @HttpCode(200)
+  @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
@@ -47,12 +47,9 @@ export class UserController {
     }
   }
 
-  @HttpCode(200)
+  @HttpCode(201)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    if (!isUUID(id)) {
-      throw new BadRequestException('Invalid userId');
-    }
+  async findOne(@Param('id', IdValidationPipe) id: string) {
     try {
       const user = await this.userService.findOne(id);
       if (!user) {
@@ -67,12 +64,9 @@ export class UserController {
   @HttpCode(200)
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', IdValidationPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    if (!isUUID(id)) {
-      throw new BadRequestException('Invalid userId');
-    }
     try {
       const updatedUser = await this.userService.update(id, updatePasswordDto);
       return updatedUser;
@@ -87,11 +81,9 @@ export class UserController {
     }
   }
 
+  @HttpCode(204)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    if (!isUUID(id)) {
-      throw new BadRequestException('Invalid userId');
-    }
+  async remove(@Param('id', IdValidationPipe) id: string) {
     const deleted = await this.userService.remove(id);
     if (!deleted) throw new NotFoundException(NOT_FOUND_USER_ERROR);
     return { statusCode: HttpStatus.NO_CONTENT };

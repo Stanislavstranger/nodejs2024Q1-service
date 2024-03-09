@@ -4,5 +4,7 @@
 	},
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
-	}
+	},
+	"docwriter.style": "Auto-detect",
+	"docwriter.hotkey.windows": "Alt + ."
 }

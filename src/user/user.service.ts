@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
@@ -38,10 +42,16 @@ export class UserService {
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<UserModel> {
     const user = await this.findOne(id);
-    user.password = updatePasswordDto.newPassword;
-    user.version++;
-    user.updatedAt = Date.now();
-    return user;
+    if (user !== undefined) {
+      if (user.password === updatePasswordDto.oldPassword) {
+        user.password = updatePasswordDto.newPassword;
+        user.version++;
+        user.updatedAt = Date.now();
+        return user;
+      }
+      throw new ForbiddenException();
+    }
+    throw new NotFoundException();
   }
 
   async remove(id: string): Promise<boolean> {

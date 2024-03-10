@@ -42,8 +42,11 @@ export class AlbumService {
       updatedAt: Date.now(),
     };
     const index = db.albums.findIndex((album) => album.id === id);
-    db.albums[index] = updatedAlbum;
-    return updatedAlbum;
+    if (index !== -1) {
+      db.albums[index] = updatedAlbum;
+      return updatedAlbum;
+    }
+    return null;
   }
 
   async remove(id: string): Promise<boolean> {

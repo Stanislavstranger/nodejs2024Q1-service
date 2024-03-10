@@ -35,7 +35,6 @@ export class FavoriteController {
   async addTrackToFavorites(@Param('id', IdValidationPipe) id: string) {
     await this.favoriteService.addTrackToFavorites(id);
     const track = await this.trackService.findOne(id);
-    console.log(track);
     return track;
   }
 

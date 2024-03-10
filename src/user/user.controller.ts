@@ -29,10 +29,18 @@ export class UserController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
     try {
       const newUser = await this.userService.create(createUserDto);
-      return newUser.login;
+
+      if (newUser === undefined) {
+        throw new NotFoundException(NOT_FOUND_USER_ERROR);
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userResponse } = newUser;
+
+      res.status(HttpStatus.CREATED).send(userResponse);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -49,22 +57,22 @@ export class UserController {
     }
   }
 
-  @HttpCode(201)
+  @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Get(':id')
   async findOne(@Param('id', IdValidationPipe) id: string) {
     try {
       const user = await this.userService.findOne(id);
-      if (!user) {
-        throw new NotFoundException(`User with id ${id} not found`);
+      if (user === undefined) {
+        throw new NotFoundException(NOT_FOUND_USER_ERROR);
       }
       return user;
     } catch (error) {
-      throw new NotFoundException(`User with id ${id} not found`);
+      throw new NotFoundException(NOT_FOUND_USER_ERROR);
     }
   }
 
-  @HttpCode(201)
+  @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Put(':id')
   async update(
@@ -73,8 +81,9 @@ export class UserController {
   ) {
     try {
       const updatedUser = await this.userService.update(id, updatePasswordDto);
-      if (updatedUser !== undefined) return updatedUser;
-      throw new NotFoundException();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userResponse } = updatedUser;
+      return userResponse;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);

@@ -73,6 +73,9 @@ export class AlbumController {
   ) {
     try {
       const updatedAlbum = await this.albumService.update(id, updateAlbumDto);
+      if (updatedAlbum === null) {
+        throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
+      }
       return updatedAlbum;
     } catch (error) {
       if (error instanceof NotFoundException) {

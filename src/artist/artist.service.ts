@@ -4,7 +4,6 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistModel } from './artist.model';
 import { DBService } from '../db/db.service';
-import { NOT_FOUND_ARTIST_ERROR } from './artist.constants';
 
 @Injectable()
 export class ArtistService {
@@ -28,9 +27,6 @@ export class ArtistService {
   async findOne(id: string): Promise<ArtistModel> {
     const db = await this.dbService.getDb();
     const artist = db.artists.find((artist) => artist.id === id);
-    if (!artist) {
-      throw new NotFoundException(NOT_FOUND_ARTIST_ERROR);
-    }
     return artist;
   }
 
@@ -46,16 +42,20 @@ export class ArtistService {
       updatedAt: Date.now(),
     };
     const index = db.artists.findIndex((artist) => artist.id === id);
-    db.artists[index] = updatedArtist;
-    return updatedArtist;
+    if (index !== -1) {
+      db.artists[index] = updatedArtist;
+      return updatedArtist;
+    }
+    throw new NotFoundException();
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<boolean> {
     const db = await this.dbService.getDb();
     const index = db.artists.findIndex((artist) => artist.id === id);
-    if (index === -1) {
-      throw new NotFoundException(NOT_FOUND_ARTIST_ERROR);
+    if (index !== -1) {
+      db.artists.splice(index, 1);
+      return true;
     }
-    db.artists.splice(index, 1);
+    return false;
   }
 }

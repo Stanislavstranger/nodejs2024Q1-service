@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4, validate } from 'uuid';
+import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumModel } from './album.model';
 import { DBService } from '../db/db.service';
-import { NOT_FOUND_ALBUM_ERROR } from './album.constants';
 
 @Injectable()
 export class AlbumService {
@@ -28,9 +27,6 @@ export class AlbumService {
   async findOne(id: string): Promise<AlbumModel> {
     const db = await this.dbService.getDb();
     const album = db.albums.find((album) => album.id === id);
-    if (!album) {
-      throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
-    }
     return album;
   }
 
@@ -50,16 +46,13 @@ export class AlbumService {
     return updatedAlbum;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<boolean> {
     const db = await this.dbService.getDb();
     const index = db.albums.findIndex((album) => album.id === id);
-    if (index === -1) {
-      throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
+    if (index !== -1) {
+      db.albums.splice(index, 1);
+      return true;
     }
-    db.albums.splice(index, 1);
-  }
-
-  async validateId(id: string): Promise<boolean> {
-    return validate(id);
+    return false;
   }
 }

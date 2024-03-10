@@ -13,12 +13,14 @@ import {
   HttpStatus,
   ForbiddenException,
   HttpCode,
+  Res,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserService } from './user.service';
 import { NOT_FOUND_USER_ERROR } from './user.constants';
 import { IdValidationPipe } from '../pipes/ad-validation.pipe';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -48,6 +50,7 @@ export class UserController {
   }
 
   @HttpCode(201)
+  @UsePipes(new ValidationPipe())
   @Get(':id')
   async findOne(@Param('id', IdValidationPipe) id: string) {
     try {
@@ -61,7 +64,8 @@ export class UserController {
     }
   }
 
-  @HttpCode(200)
+  @HttpCode(201)
+  @UsePipes(new ValidationPipe())
   @Put(':id')
   async update(
     @Param('id', IdValidationPipe) id: string,
@@ -69,7 +73,8 @@ export class UserController {
   ) {
     try {
       const updatedUser = await this.userService.update(id, updatePasswordDto);
-      return updatedUser;
+      if (updatedUser !== undefined) return updatedUser;
+      throw new NotFoundException();
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
@@ -82,10 +87,14 @@ export class UserController {
   }
 
   @HttpCode(204)
+  @UsePipes(new ValidationPipe())
   @Delete(':id')
-  async remove(@Param('id', IdValidationPipe) id: string) {
+  async remove(
+    @Param('id', IdValidationPipe) id: string,
+    @Res() res: Response,
+  ) {
     const deleted = await this.userService.remove(id);
     if (!deleted) throw new NotFoundException(NOT_FOUND_USER_ERROR);
-    return { statusCode: HttpStatus.NO_CONTENT };
+    res.status(HttpStatus.NO_CONTENT).end();
   }
 }

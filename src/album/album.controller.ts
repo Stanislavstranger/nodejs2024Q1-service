@@ -8,41 +8,92 @@ import {
   Post,
   UsePipes,
   ValidationPipe,
+  HttpCode,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumService } from './album.service';
+import { IdValidationPipe } from '../pipes/ad-validation.pipe';
+import { Response } from 'express';
+import { NOT_FOUND_ALBUM_ERROR } from './album.constants';
 
-@Controller('albums')
+@Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
+  @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @Post()
   async create(@Body() createAlbumDto: CreateAlbumDto) {
-    return this.albumService.create(createAlbumDto);
+    try {
+      const newAlbum = await this.albumService.create(createAlbumDto);
+      return newAlbum;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
+  @HttpCode(200)
   @Get()
   async findAll() {
-    return this.albumService.findAll();
+    try {
+      const albums = await this.albumService.findAll();
+      return albums;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.albumService.findOne(id);
+  async findOne(@Param('id', IdValidationPipe) id: string) {
+    try {
+      const album = await this.albumService.findOne(id);
+      if (album !== undefined) {
+        return album;
+      }
+      throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
+    } catch (error) {
+      throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
+    }
   }
 
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', IdValidationPipe) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    return this.albumService.update(id, updateAlbumDto);
+    try {
+      const updatedAlbum = await this.albumService.update(id, updateAlbumDto);
+      return updatedAlbum;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else if (error instanceof ForbiddenException) {
+        throw new ForbiddenException(error.message);
+      } else {
+        throw new BadRequestException(error.message);
+      }
+    }
   }
 
+  @HttpCode(204)
+  @UsePipes(new ValidationPipe())
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.albumService.remove(id);
+  async remove(
+    @Param('id', IdValidationPipe) id: string,
+    @Res() res: Response,
+  ) {
+    const deleted = await this.albumService.remove(id);
+    if (!deleted) throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
+    res.status(HttpStatus.NO_CONTENT).end();
   }
 }

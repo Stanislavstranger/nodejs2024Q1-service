@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4, validate } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackModel } from './track.model';
 import { DBService } from '../db/db.service';
-import { NOT_FOUND_TRACK_ERROR } from './track.constants';
 
 @Injectable()
 export class TrackService {
@@ -28,9 +27,6 @@ export class TrackService {
   async findOne(id: string): Promise<TrackModel> {
     const db = await this.dbService.getDb();
     const track = db.tracks.find((track) => track.id === id);
-    if (!track) {
-      throw new NotFoundException(NOT_FOUND_TRACK_ERROR);
-    }
     return track;
   }
 
@@ -46,20 +42,20 @@ export class TrackService {
       updatedAt: Date.now(),
     };
     const index = db.tracks.findIndex((track) => track.id === id);
-    db.tracks[index] = updatedTrack;
-    return updatedTrack;
+    if (index !== -1) {
+      db.tracks[index] = updatedTrack;
+      return updatedTrack;
+    }
+    throw new NotFoundException();
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<boolean> {
     const db = await this.dbService.getDb();
     const index = db.tracks.findIndex((track) => track.id === id);
-    if (index === -1) {
-      throw new NotFoundException(NOT_FOUND_TRACK_ERROR);
+    if (index !== -1) {
+      db.tracks.splice(index, 1);
+      return true;
     }
-    db.tracks.splice(index, 1);
-  }
-
-  async validateId(id: string): Promise<boolean> {
-    return validate(id);
+    return false;
   }
 }

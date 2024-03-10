@@ -21,10 +21,14 @@ import { AlbumService } from './album.service';
 import { IdValidationPipe } from '../pipes/ad-validation.pipe';
 import { Response } from 'express';
 import { NOT_FOUND_ALBUM_ERROR } from './album.constants';
+import { TrackService } from '../track/track.service';
 
 @Controller('album')
 export class AlbumController {
-  constructor(private readonly albumService: AlbumService) {}
+  constructor(
+    private readonly albumService: AlbumService,
+    private readonly trackService: TrackService,
+  ) {}
 
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
@@ -97,6 +101,7 @@ export class AlbumController {
   ) {
     const deleted = await this.albumService.remove(id);
     if (!deleted) throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
+    this.trackService.setTrackAlbumIdNull(id);
     res.status(HttpStatus.NO_CONTENT).end();
   }
 }

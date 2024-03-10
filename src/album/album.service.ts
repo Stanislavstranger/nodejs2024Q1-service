@@ -58,4 +58,12 @@ export class AlbumService {
     }
     return false;
   }
+
+  async setAlbumArtistIdNull(artistId: string): Promise<void> {
+    const db = await this.dbService.getDb();
+    const index = db.albums.findIndex((album) => album.artistId === artistId);
+    if (index !== -1) {
+      db.albums[index].artistId = null;
+    }
+  }
 }

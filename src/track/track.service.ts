@@ -58,4 +58,20 @@ export class TrackService {
     }
     return false;
   }
+
+  async setTrackAlbumIdNull(albumId: string): Promise<void> {
+    const db = await this.dbService.getDb();
+    const index = db.tracks.findIndex((track) => track.albumId === albumId);
+    if (index !== -1) {
+      db.tracks[index].albumId = null;
+    }
+  }
+
+  async setTrackArtistIdNull(artistId: string): Promise<void> {
+    const db = await this.dbService.getDb();
+    const index = db.tracks.findIndex((track) => track.artistId === artistId);
+    if (index !== -1) {
+      db.tracks[index].artistId = null;
+    }
+  }
 }

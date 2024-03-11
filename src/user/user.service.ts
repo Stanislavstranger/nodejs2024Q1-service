@@ -56,7 +56,7 @@ export class UserService {
         };
         const index = db.users.findIndex((user) => user.id === id);
         if (index !== -1) {
-          db.users[index] = updateUser;
+          db.users.push(updateUser);
           return db.users[index];
         }
         throw new NotFoundException();

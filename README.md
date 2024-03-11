@@ -68,10 +68,10 @@ npm run format
 ### User:
 
 - `GET /user` - Get all users.
-- `GET /user/:id` - Get a single user by ID (ex. “/users/123”)
+- `GET /user/:id` - Get a single user by ID (ex. “/user/123”)
 - `POST /user` - Create a new user.
-- `PUT /user/:id}` - Update a user's password (ex. “/users/123”)
-- `DELETE /user/:id` - Delete a user (ex. “/users/123”)
+- `PUT /user/:id}` - Update a user's password (ex. “/user/123”)
+- `DELETE /user/:id` - Delete a user (ex. “/user/123”)
 
 ### Artists:
 

@@ -29,7 +29,7 @@ export class UserController {
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+  async create(@Body() createUserDto: CreateUserDto) {
     try {
       const newUser = await this.userService.create(createUserDto);
 
@@ -40,7 +40,7 @@ export class UserController {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...userResponse } = newUser;
 
-      res.status(HttpStatus.CREATED).send(userResponse);
+      return userResponse;
     } catch (error) {
       throw new BadRequestException(error.message);
     }

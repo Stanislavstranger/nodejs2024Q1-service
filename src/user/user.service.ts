@@ -41,13 +41,25 @@ export class UserService {
     id: string,
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<UserModel> {
+    const db = await this.dbService.getDb();
     const user = await this.findOne(id);
     if (user !== undefined) {
       if (user.password === updatePasswordDto.oldPassword) {
         user.password = updatePasswordDto.newPassword;
         user.version++;
         user.updatedAt = Date.now();
-        return user;
+        const updateUser = {
+          ...user,
+          password: user.password,
+          version: user.version,
+          updatedAt: user.updatedAt,
+        };
+        const index = db.users.findIndex((user) => user.id === id);
+        if (index !== -1) {
+          db.users[index] = updateUser;
+          return db.users[index];
+        }
+        throw new NotFoundException();
       }
       throw new ForbiddenException();
     }

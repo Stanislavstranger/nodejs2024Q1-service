@@ -5,6 +5,7 @@ import {
   HttpCode,
   Param,
   Post,
+  UnprocessableEntityException,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -26,8 +27,38 @@ export class FavoriteController {
   @Get()
   async findAll() {
     const favorites = this.favoriteService.findAll();
-    // console.log(favorites);
-    return favorites;
+
+    const artistsData = [];
+    for (const artist of favorites.artists) {
+      const artistData = await this.artistService.findOne(artist);
+      if (artistData) {
+        artistsData.push(artistData);
+      }
+    }
+
+    const albumsData = [];
+    for (const album of favorites.albums) {
+      const albumData = await this.albumService.findOne(album);
+      if (albumData) {
+        albumsData.push(albumData);
+      }
+    }
+
+    const tracksData = [];
+    for (const track of favorites.tracks) {
+      const trackData = await this.trackService.findOne(track);
+      if (trackData) {
+        tracksData.push(trackData);
+      }
+    }
+
+    const favoriteResponse = {
+      artists: [...artistsData],
+      albums: [...albumsData],
+      tracks: [...tracksData],
+    };
+
+    return favoriteResponse;
   }
 
   @UsePipes(new ValidationPipe())
@@ -35,6 +66,11 @@ export class FavoriteController {
   async addTrackToFavorites(@Param('id', IdValidationPipe) id: string) {
     await this.favoriteService.addTrackToFavorites(id);
     const track = await this.trackService.findOne(id);
+
+    if (track === undefined) {
+      throw new UnprocessableEntityException();
+    }
+
     return track;
   }
 
@@ -49,7 +85,13 @@ export class FavoriteController {
   @Post('album/:id')
   async addAlbumToFavorites(@Param('id', IdValidationPipe) id: string) {
     this.favoriteService.addAlbumToFavorites(id);
-    return await this.albumService.findOne(id);
+    const album = await this.albumService.findOne(id);
+
+    if (album === undefined) {
+      throw new UnprocessableEntityException();
+    }
+
+    return album;
   }
 
   @HttpCode(204)
@@ -63,7 +105,13 @@ export class FavoriteController {
   @Post('artist/:id')
   async addArtistToFavorites(@Param('id', IdValidationPipe) id: string) {
     this.favoriteService.addArtistToFavorites(id);
-    return await this.artistService.findOne(id);
+    const artist = await this.artistService.findOne(id);
+
+    if (artist === undefined) {
+      throw new UnprocessableEntityException();
+    }
+
+    return artist;
   }
 
   @HttpCode(204)

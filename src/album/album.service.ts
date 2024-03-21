@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { AlbumModel } from './album.model';
+import { Album } from './album.model';
 import { DBService } from '../db/db.service';
 
 @Injectable()
 export class AlbumService {
   constructor(private readonly dbService: DBService) {}
 
-  async create(createAlbumDto: CreateAlbumDto): Promise<AlbumModel> {
+  async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
     const db = await this.dbService.getDb();
-    const newAlbum: AlbumModel = {
+    const newAlbum: Album = {
       id: uuidv4(),
       ...createAlbumDto,
     };
@@ -19,21 +19,18 @@ export class AlbumService {
     return newAlbum;
   }
 
-  async findAll(): Promise<AlbumModel[]> {
+  async findAll(): Promise<Album[]> {
     const db = await this.dbService.getDb();
     return db.albums;
   }
 
-  async findOne(id: string): Promise<AlbumModel> {
+  async findOne(id: string): Promise<Album> {
     const db = await this.dbService.getDb();
     const album = db.albums.find((album) => album.id === id);
     return album;
   }
 
-  async update(
-    id: string,
-    updateAlbumDto: UpdateAlbumDto,
-  ): Promise<AlbumModel> {
+  async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
     const db = await this.dbService.getDb();
     const album = await this.findOne(id);
     const updatedAlbum = {

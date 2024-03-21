@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { TrackModel } from './track.model';
+import { Track } from './track.model';
 import { DBService } from '../db/db.service';
 
 @Injectable()
 export class TrackService {
   constructor(private readonly dbService: DBService) {}
 
-  async create(createTrackDto: CreateTrackDto): Promise<TrackModel> {
+  async create(createTrackDto: CreateTrackDto): Promise<Track> {
     const db = await this.dbService.getDb();
-    const newTrack: TrackModel = {
+    const newTrack: Track = {
       id: uuidv4(),
       ...createTrackDto,
     };
@@ -19,21 +19,18 @@ export class TrackService {
     return newTrack;
   }
 
-  async findAll(): Promise<TrackModel[]> {
+  async findAll(): Promise<Track[]> {
     const db = await this.dbService.getDb();
     return db.tracks;
   }
 
-  async findOne(id: string): Promise<TrackModel> {
+  async findOne(id: string): Promise<Track> {
     const db = await this.dbService.getDb();
     const track = db.tracks.find((track) => track.id === id);
     return track;
   }
 
-  async update(
-    id: string,
-    updateTrackDto: UpdateTrackDto,
-  ): Promise<TrackModel> {
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
     const db = await this.dbService.getDb();
     const track = await this.findOne(id);
     const updatedTrack = {

@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { ArtistModel } from './artist.model';
+import { Artist } from './artist.model';
 import { DBService } from '../db/db.service';
 
 @Injectable()
 export class ArtistService {
   constructor(private readonly dbService: DBService) {}
 
-  async create(createArtistDto: CreateArtistDto): Promise<ArtistModel> {
+  async create(createArtistDto: CreateArtistDto): Promise<Artist> {
     const db = await this.dbService.getDb();
-    const newArtist: ArtistModel = {
+    const newArtist: Artist = {
       id: uuidv4(),
       ...createArtistDto,
     };
@@ -19,21 +19,18 @@ export class ArtistService {
     return newArtist;
   }
 
-  async findAll(): Promise<ArtistModel[]> {
+  async findAll(): Promise<Artist[]> {
     const db = await this.dbService.getDb();
     return db.artists;
   }
 
-  async findOne(id: string): Promise<ArtistModel> {
+  async findOne(id: string): Promise<Artist> {
     const db = await this.dbService.getDb();
     const artist = db.artists.find((artist) => artist.id === id);
     return artist;
   }
 
-  async update(
-    id: string,
-    updateArtistDto: UpdateArtistDto,
-  ): Promise<ArtistModel> {
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
     const db = await this.dbService.getDb();
     const artist = await this.findOne(id);
     const updatedArtist = {

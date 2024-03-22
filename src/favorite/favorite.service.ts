@@ -1,49 +1,103 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
+import { Favorite } from './favorite.entity';
+import { AlbumService } from 'src/album/album.service';
+import { ArtistService } from 'src/artist/artist.service';
+import { TrackService } from 'src/track/track.service';
 
 @Injectable()
 export class FavoriteService {
-  private favoriteArtists: Set<string> = new Set();
-  private favoriteAlbums: Set<string> = new Set();
-  private favoriteTracks: Set<string> = new Set();
+  constructor(
+    @InjectRepository(Favorite)
+    private readonly repository: Repository<Favorite>,
+    @Inject(forwardRef(() => AlbumService))
+    private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => ArtistService))
+    private readonly artistService: ArtistService,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
+  ) {}
 
-  findAll(): { artists: string[]; albums: string[]; tracks: string[] } {
-    return {
-      artists: Array.from(this.favoriteArtists),
-      albums: Array.from(this.favoriteAlbums),
-      tracks: Array.from(this.favoriteTracks),
-    };
+  private async getOrCreateDefaultFavorites() {
+    try {
+      return await this.repository.findOneOrFail({
+        where: {
+          id: Not(IsNull()),
+        },
+        relations: {
+          artists: true,
+          albums: true,
+          tracks: true,
+        },
+      });
+    } catch (e) {
+      return Favorite.create();
+    }
   }
 
-  addArtistToFavorites(artistId: string): void {
-    this.favoriteArtists.add(artistId);
+  async findAll() {
+    return this.getOrCreateDefaultFavorites();
   }
 
-  deleteArtistFromFavorites(artistId: string): void {
-    if (!this.favoriteArtists.has(artistId)) {
+  async addArtistToFavorites(artistId: string): Promise<void> {
+    const artist = await this.artistService.findOne(artistId);
+    const favorites = await this.getOrCreateDefaultFavorites();
+
+    favorites.addArtist(artist);
+
+    await this.repository.save(favorites);
+  }
+
+  async deleteArtistFromFavorites(artistId: string): Promise<void> {
+    const favorites = await this.getOrCreateDefaultFavorites();
+
+    if (!favorites.removeArtist(artistId)) {
       throw new NotFoundException('Artist not found in favorites');
     }
-    this.favoriteArtists.delete(artistId);
+
+    await this.repository.save(favorites);
   }
 
-  addAlbumToFavorites(albumId: string): void {
-    this.favoriteAlbums.add(albumId);
+  async addAlbumToFavorites(albumId: string): Promise<void> {
+    const album = await this.albumService.findOne(albumId);
+    const favorites = await this.getOrCreateDefaultFavorites();
+
+    favorites.addAlbum(album);
+    await this.repository.save(favorites);
   }
 
-  deleteAlbumFromFavorites(albumId: string): void {
-    if (!this.favoriteAlbums.has(albumId)) {
+  async deleteAlbumFromFavorites(albumId: string): Promise<void> {
+    const favorites = await this.getOrCreateDefaultFavorites();
+
+    if (!favorites.removeAlbum(albumId)) {
       throw new NotFoundException('Album not found in favorites');
     }
-    this.favoriteAlbums.delete(albumId);
+
+    await this.repository.save(favorites);
   }
 
-  addTrackToFavorites(trackId: string): void {
-    this.favoriteTracks.add(trackId);
+  async addTrackToFavorites(trackId: string): Promise<void> {
+    const track = await this.trackService.findOne(trackId);
+    const favorites = await this.getOrCreateDefaultFavorites();
+
+    favorites.addTrack(track);
+
+    await this.repository.save(favorites);
   }
 
-  deleteTrackFromFavorites(trackId: string): void {
-    if (!this.favoriteTracks.has(trackId)) {
+  async deleteTrackFromFavorites(trackId: string): Promise<void> {
+    const favorites = await this.getOrCreateDefaultFavorites();
+
+    if (!favorites.removeTrack(trackId)) {
       throw new NotFoundException('Track not found in favorites');
     }
-    this.favoriteTracks.delete(trackId);
+
+    await this.repository.save(favorites);
   }
 }

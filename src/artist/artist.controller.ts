@@ -19,18 +19,11 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistService } from './artist.service';
 import { IdValidationPipe } from '../pipes/ad-validation.pipe';
-import { NOT_FOUND_ARTIST_ERROR } from './artist.constants';
 import { Response } from 'express';
-import { TrackService } from '../track/track.service';
-import { AlbumService } from '../album/album.service';
 
 @Controller('artist')
 export class ArtistController {
-  constructor(
-    private readonly artistService: ArtistService,
-    private readonly trackService: TrackService,
-    private readonly albumService: AlbumService,
-  ) {}
+  constructor(private readonly artistService: ArtistService) {}
 
   @HttpCode(201)
   @UsePipes(new ValidationPipe())
@@ -101,10 +94,7 @@ export class ArtistController {
     @Param('id', IdValidationPipe) id: string,
     @Res() res: Response,
   ) {
-    const deleted = await this.artistService.remove(id);
-    if (!deleted) throw new NotFoundException(NOT_FOUND_ARTIST_ERROR);
-    await this.trackService.setTrackArtistIdNull(id);
-    await this.albumService.setAlbumArtistIdNull(id);
+    await this.artistService.remove(id);
     res.status(HttpStatus.NO_CONTENT).end();
   }
 }

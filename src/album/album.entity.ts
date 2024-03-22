@@ -5,16 +5,18 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Artist } from '../artist/artist.model';
-import { Album } from '../album/album.model';
+import { Artist } from '../artist/artist.entity';
 
 @Entity()
-export class Track {
+export class Album {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   name: string;
+
+  @Column()
+  year: number;
 
   @Column({ nullable: true })
   artistId: string | null;
@@ -22,14 +24,4 @@ export class Track {
   @ManyToOne(() => Artist, { nullable: true })
   @JoinColumn({ name: 'artistId' })
   artist: Artist | null;
-
-  @Column({ nullable: true })
-  albumId: string | null;
-
-  @ManyToOne(() => Album, { nullable: true })
-  @JoinColumn({ name: 'albumId' })
-  album: Album | null;
-
-  @Column()
-  duration: number;
 }

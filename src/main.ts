@@ -4,7 +4,7 @@ import 'colors';
 import * as swaggerUi from 'swagger-ui-express';
 import * as swaggerJsdoc from 'swagger-jsdoc';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

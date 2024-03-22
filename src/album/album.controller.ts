@@ -99,9 +99,7 @@ export class AlbumController {
     @Param('id', IdValidationPipe) id: string,
     @Res() res: Response,
   ) {
-    const deleted = await this.albumService.remove(id);
-    if (!deleted) throw new NotFoundException(NOT_FOUND_ALBUM_ERROR);
-    this.trackService.setTrackAlbumIdNull(id);
+    await this.albumService.remove(id);
     res.status(HttpStatus.NO_CONTENT).end();
   }
 }

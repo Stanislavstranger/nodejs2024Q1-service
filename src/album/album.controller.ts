@@ -21,14 +21,10 @@ import { AlbumService } from './album.service';
 import { IdValidationPipe } from '../pipes/ad-validation.pipe';
 import { Response } from 'express';
 import { NOT_FOUND_ALBUM_ERROR } from './album.constants';
-import { TrackService } from '../track/track.service';
 
 @Controller('album')
 export class AlbumController {
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-  ) {}
+  constructor(private readonly albumService: AlbumService) {}
 
   @HttpCode(201)
   @UsePipes(new ValidationPipe())

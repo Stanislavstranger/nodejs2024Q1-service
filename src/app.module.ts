@@ -8,6 +8,7 @@ import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { dataSourceConfig } from './config/data-source.config';
 
 @Module({
   imports: [
@@ -17,17 +18,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ArtistModule,
     TrackModule,
     UserModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.TYPEORM_HOST || 'postgres',
-      port: +process.env.TYPEORM_PORT || 5432,
-      username: process.env.TYPEORM_USERNAME || 'user',
-      password: process.env.TYPEORM_PASSWORD || 'password',
-      database: process.env.TYPEORM_DATABASE || 'database',
-      entities: ['dist/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      migrations: ['dist/migrations/*.js'],
-    }),
+    TypeOrmModule.forRoot(dataSourceConfig),
   ],
   controllers: [AppController],
   providers: [AppService],

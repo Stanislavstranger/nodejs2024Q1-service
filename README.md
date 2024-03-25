@@ -30,12 +30,41 @@ PORT=4000
 ## Running application
 
 ```
-npm start
+docker-compose up
 ```
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/docs/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+## Stop application
+
+```
+docker-compose down
+```
+
+## Running application and Stop application with using `Makefile`
+
+You can also use a `Makefile` to avoid typing long commands
+
+## If port: `5432` is busy
+
+Most likely there is a local version of postgres running there
+
+To disable your local PostgreSQL server, you need to stop it. Here's how to do it depending on your operating system:
+
+### Linux:
+```
+sudo service postgresql stop
+```
+### macOS:
+```
+sudo launchctl stop com.postgresql.postgres
+```
+### Windows:
+```
+net stop postgresql
+```
 
 ## Testing
 
@@ -70,7 +99,7 @@ npm run format
 - `GET /user` - Get all users.
 - `GET /user/:id` - Get a single user by ID (ex. “/user/123”)
 - `POST /user` - Create a new user.
-- `PUT /user/:id}` - Update a user's password (ex. “/user/123”)
+- `PUT /user/:id` - Update a user's password (ex. “/user/123”)
 - `DELETE /user/:id` - Delete a user (ex. “/user/123”)
 
 ### Artists:

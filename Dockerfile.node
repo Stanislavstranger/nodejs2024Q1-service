@@ -1,7 +1,5 @@
 FROM node:20-alpine as builder
 
-WORKDIR /app
-
 COPY package*.json ./
 RUN npm ci
 
@@ -17,8 +15,8 @@ COPY package*.json ./
 RUN npm ci --only=production \
     && npm cache clean --force
 
-COPY /dist .
-COPY /doc ./doc
+COPY --from=builder /dist .
+COPY --from=builder /doc ./doc
 
 ENV NODE_ENV production
 
